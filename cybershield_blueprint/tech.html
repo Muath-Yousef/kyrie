@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 · Technical Architecture — CyberShield MSSP Blueprint</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<nav id="sidebar"></nav>
+<div id="main">
+
+<div class="hero"><div class="hero-grid"></div>
+<div class="hero-tag">◈ Section 05 · Technical Architecture: SOC / SIEM / SOAR / Multi-Tenant</div>
+<h1>Technical <span>Architecture</span><br>& SOC Design</h1>
+<div class="hero-badges">
+<span class="badge ac">Wazuh + Elastic</span><span class="badge ac">Shuffle SOAR</span>
+<span class="badge go">OpenCTI + MISP</span><span class="badge or">TheHive Case Mgmt</span>
+<span class="badge gr">Hetzner Cloud</span><span class="badge pu">Multi-Tenant Isolation</span>
+</div>
+<div class="hero-meta">
+<div class="hero-stat"><div class="val">85%</div><div class="lbl">Alert Automation Target</div></div>
+<div class="hero-stat gold-s"><div class="val">30–35</div><div class="lbl">Clients per Analyst</div></div>
+<div class="hero-stat orange-s"><div class="val">JOD 45–255</div><div class="lbl">COGS / Client / Month</div></div>
+<div class="hero-stat green-s"><div class="val">€45/mo</div><div class="lbl">Base Infra Cost (3x Hetzner)</div></div>
+</div></div>
+
+<div class="page-nav">
+<a href="#philosophy" class="active">SOC Philosophy</a>
+<a href="#stack">Tech Stack</a>
+<a href="#multitenant">Multi-Tenant</a>
+<a href="#automation">Automation Engine</a>
+<a href="#log-economics">Log Economics</a>
+<a href="#scaling">Infra Scaling</a>
+</div>
+
+<section class="section" id="philosophy">
+<div class="section-header"><span class="section-num">05.1</span><h1 class="section-title">SOC Design Philosophy: Automation-First</h1></div>
+
+<div class="callout gold">
+<div class="callout-title">Core Architectural Insight</div>
+<p>Run the SOC automation-first. Playbooks close repeatable alerts. Analysts focus on high-impact exceptions. This model keeps quality high at SMB pricing.</p>
+</div>
+
+<div class="card-grid cols-3 mt-20">
+<div class="card ac-top">
+<div class="card-label">Traditional MSSP Model</div>
+<h3>Analyst-Heavy</h3>
+<ul>
+<li>1 analyst per 8–12 clients</li>
+<li>Manual alert triage: 60–70% of time</li>
+<li>High salary overhead</li>
+<li>Limited scalability</li>
+<li>SIEM licensing: $50K+/year (Splunk/QRadar)</li>
+<li>Break-even: 30–40 clients minimum</li>
+</ul>
+</div>
+<div class="card or-top">
+<h3 style="color:var(--accent2);">Our Model</h3>
+<div class="card-label">Automation-First</div>
+<ul>
+<li>1 analyst per 30–35 clients</li>
+<li>85% alerts auto-resolved/enriched</li>
+<li>Low salary overhead (Jordan-based)</li>
+<li>Sub-linear cost scaling</li>
+<li>SIEM: Wazuh + Elastic (infra cost only)</li>
+<li>Break-even: 20–22 clients</li>
+</ul>
+</div>
+<div class="card gr-top">
+<div class="card-label">Result</div>
+<h3>Structural Advantage</h3>
+<ul>
+<li>73–79% gross margin per client</li>
+<li>vs. industry average 40–55%</li>
+<li>Analyst time: 2–5h/client/month</li>
+<li>vs. industry 15–25h/client/month</li>
+<li>Scales to 80+ clients with 4–5 staff</li>
+<li>Traditional MSSP needs 10+ analysts at 80 clients</li>
+</ul>
+</div>
+</div>
+
+<div class="card-grid cols-2 mt-20">
+<div class="card">
+<h3>The Three Engine Layers</h3>
+<p><strong>Layer 1 — Detection (Wazuh + Elastic):</strong> Collect, normalize, and correlate logs. Produce scored alerts with tenant context.</p>
+<p><strong>Layer 2 — Automation (Shuffle SOAR):</strong> Enrich, classify, and execute standard response steps. Escalate only high-severity or ambiguous events.</p>
+<p><strong>Layer 3 — Advisory (Analyst + vCISO):</strong> Make incident decisions, interpret compliance impact, and communicate to clients.</p>
+</div>
+<div class="card">
+<h3>Synapse Core — Internal Platform Identity</h3>
+<p><strong>Synapse Core</strong> is one operating platform, not a loose toolset. Standardization keeps onboarding fast and delivery consistent.</p>
+<p>Core stack: Wazuh + Shuffle + Elastic + TheHive + OpenCTI + internal rule/playbook libraries. This stack drives the 85% automation target and protects gross margin.</p>
+<div class="callout" style="margin-top:10px; padding:8px 12px;">
+<p style="margin:0; font-size:10px;">Long-term optionality: white-label Synapse Core to other Jordan IT firms as a platform-as-a-service revenue stream (JOD 500–800/month per partner).</p>
+</div>
+</div>
+</div>
+<div class="card mt-20">
+<h3>Business effect</h3>
+<ul>
+<li><strong>Cost impact:</strong> Open-source-first architecture keeps fixed platform costs low while clients scale.</li>
+<li><strong>Analyst time impact:</strong> Automation-first operations move analysts from repetitive triage to exception handling.</li>
+<li><strong>Margin impact:</strong> Lower delivery cost per client supports 73–79% gross margin at target scale.</li>
+</ul>
+</div>
+</section>
+
+<section class="section" id="stack">
+<div class="section-header"><span class="section-num">05.2</span><h1 class="section-title">Full Technology Stack</h1></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Layer</th><th>Primary Tool</th><th>Alternative</th><th>License</th><th class="num">Monthly Cost (JOD)</th><th>Why This Choice</th></tr></thead>
+<tbody>
+<tr><td class="bold ac">SIEM</td><td>Wazuh 4.x + Elasticsearch 8.x</td><td>Microsoft Sentinel (pay-per-GB)</td><td>Open-source / Apache 2.0</td><td class="num ac">35–120 (infra only)</td><td>Zero licensing. 400+ default rules. Scales to enterprise. Sentinel = $2.46+/GB — destroys SMB margins.</td></tr>
+<tr><td class="bold ac">SOAR</td><td>Shuffle (open-source)</td><td>Tines (free tier), n8n</td><td>Open-source / AGPL</td><td class="num ac">10–20 (infra)</td><td>1,000+ integrations. Python-based workflows. Self-hosted. No per-action pricing.</td></tr>
+<tr><td class="bold ac">Case Management</td><td>TheHive 5</td><td>JIRA Service Mgmt</td><td>Open-source / AGPL</td><td class="num ac">5–10 (infra)</td><td>MISP integration native. Alert → Case automation. Per-client org isolation.</td></tr>
+<tr><td class="bold go">Threat Intelligence</td><td>OpenCTI + MISP</td><td>Recorded Future ($$$)</td><td>Open-source</td><td class="num ac">10–20 (infra)</td><td>Free feeds: AlienVault OTX, MITRE ATT&CK, CIRCL MISP. Professional-grade intel at zero cost.</td></tr>
+<tr><td class="bold go">Endpoint Agents</td><td>Wazuh agents</td><td>Velociraptor, Sysmon</td><td>Free (bundled)</td><td class="num ac">0</td><td>Deployed remotely via MSI/DEB/RPM. FIM, rootkit detection, process monitoring, SCA.</td></tr>
+<tr><td class="bold go">Vulnerability Scanner</td><td>OpenVAS / Greenbone CE</td><td>Nessus Pro (~JOD 680/yr)</td><td>Open-source / GPL</td><td class="num ac">5–10 (infra)</td><td>CVE scanning, network discovery, compliance checks. Self-hosted. No per-asset fees.</td></tr>
+<tr><td class="bold or">WAF / Web Protection</td><td>Cloudflare WAF + DDoS</td><td>AWS WAF, Sucuri</td><td class="num">$20/domain/month</td><td class="num ac">7–14 per client</td><td>Global CDN + WAF + DDoS L3/L4/L7. Per-domain billing. Pass-through + margin.</td></tr>
+<tr><td class="bold or">Email Security</td><td>DMARC/SPF/DKIM + MXToolbox + custom monitoring</td><td>Proofpoint ($$$)</td><td>Free + manual</td><td class="num ac">5–15 per client</td><td>DMARC reporting (free), SPF/DKIM checks automated. No enterprise tool needed for SMB.</td></tr>
+<tr><td class="bold or">Dark Web Monitoring</td><td>Flare.io (reseller) or SpyCloud</td><td>HaveIBeenPwned API (free tier)</td><td>Per-domain reseller</td><td class="num ac">8–15 per client</td><td>Resell at 40–60% margin. Domain + credential monitoring. Monthly report.</td></tr>
+<tr><td class="bold pu">Cloud Hosting (SIEM/SOAR)</td><td>Hetzner Cloud (EU/Falkenstein)</td><td>AWS / Azure</td><td>Per-server monthly</td><td class="num ac">55–520</td><td>3–8x cheaper than AWS for same specs. EU data residency (GDPR). Excellent bandwidth. Phase 1: 2x CX31 = €30/mo.</td></tr>
+<tr><td class="bold pu">Backup + DR</td><td>Backblaze B2 + Restic</td><td>AWS S3 Glacier</td><td class="num">$0.006/GB/month</td><td class="num ac">5–15</td><td>Daily encrypted backups. 12-month retention. ~JOD 15/month for full client data backup.</td></tr>
+<tr><td class="bold pu">Collaboration / SOPs</td><td>Notion (team)</td><td>Confluence</td><td class="num">$16/user/month</td><td class="num ac">8–16</td><td>Client runbooks, SOPs, incident templates. Client portal in Phase 2.</td></tr>
+<tr><td class="bold pu">Communication</td><td>Microsoft 365 + Teams</td><td>Google Workspace</td><td class="num">$6–12/user/month</td><td class="num ac">11–22</td><td>Professional email domain. UAE client credibility. Teams for client calls.</td></tr>
+<tr class="subtotal"><td colspan="4" class="bold">TOTAL PLATFORM COST (0–15 clients)</td><td class="num bold">JOD 155–280/month</td><td>Scales sub-linearly</td></tr>
+<tr class="total"><td colspan="4" class="bold">TOTAL PLATFORM COST (50–80 clients)</td><td class="num bold">JOD 380–520/month</td><td>Only compute + storage scales</td></tr>
+</tbody></table>
+</div>
+<div class="card mt-20">
+<h3>Business effect</h3>
+<ul>
+<li><strong>Cost impact:</strong> Wazuh, Shuffle, TheHive, OpenCTI, and MISP remove license-heavy SIEM/SOAR spend.</li>
+<li><strong>Analyst time impact:</strong> Tight tool integration reduces swivel-chair work across detection, response, and case management.</li>
+<li><strong>Margin impact:</strong> Lower platform COGS allows competitive pricing without compressing gross margin.</li>
+</ul>
+</div>
+</section>
+
+<section class="section" id="multitenant">
+<div class="section-header"><span class="section-num">05.3</span><h1 class="section-title">Multi-Tenant Architecture — Client Isolation</h1></div>
+
+<div class="callout danger">
+<div class="callout-title">Critical Security Requirement — Never Shared Indexes</div>
+<p>In a multi-client MSSP, your platform is a prime target. Any cross-tenant data exposure is a catastrophic breach. Enforce strict tenant isolation from Day 1.</p>
+</div>
+
+<div class="card-grid cols-2 mt-20">
+<div class="card ac-top">
+<h3>Elasticsearch Multi-Tenant Design</h3>
+<ul>
+<li><strong>Index pattern per client:</strong> <code>wazuh-alerts-client-acme-*</code> — never shared indexes</li>
+<li><strong>Index lifecycle policy (ILM):</strong> Hot → Warm → Cold → Delete based on retention tier</li>
+<li><strong>Role-based access (RBAC):</strong> Each client namespace has its own Elastic role — analysts cannot query other namespaces without explicit grant</li>
+<li><strong>Kibana Spaces:</strong> Separate dashboard space per client with client-specific visualizations</li>
+<li><strong>Data retention by tier:</strong> SOC Lite: 30-day hot + 60-day cold. SOC Standard: 60-day hot + 6-month cold. SOC Pro: 90-day hot + 12-month cold</li>
+</ul>
+</div>
+<div class="card go-top">
+<h3>Wazuh + TheHive Isolation</h3>
+<ul>
+<li><strong>Wazuh manager groups:</strong> Each client is a named group in Wazuh manager. Agents tagged with group ID. Rules and decoders can be group-specific.</li>
+<li><strong>TheHive organizations:</strong> One org per client. Analysts assigned to specific orgs only. Cases, observables, and timeline never cross orgs.</li>
+<li><strong>Shuffle workflows:</strong> Named workspace per client. Client-specific API keys for integrations (firewall, AD, email). No shared workflow handles multiple clients.</li>
+<li><strong>Network segmentation:</strong> Client agent traffic flows via encrypted channel (Wazuh protocol over port 1514/1515). No client can reach another client's agent.</li>
+</ul>
+</div>
+</div>
+
+<div class="card mt-20">
+<h3>Admin Security Model (Protecting Your Own Infrastructure)</h3>
+<div class="card-grid cols-3" style="margin-top:14px;">
+<div>
+<p style="font-size:11px;"><strong>Access Control:</strong></p>
+<ul style="font-size:10.5px;">
+<li>All admin access via YubiKey hardware MFA (mandatory)</li>
+<li>No SSH password auth — key-based only</li>
+<li>Admin VPN required for all infra access</li>
+<li>Separate admin account per analyst — no shared credentials</li>
+<li>Privileged Access Workstation (PAW) policy for admin tasks</li>
+</ul>
+</div>
+<div>
+<p style="font-size:11px;"><strong>Monitoring Your Own Infra:</strong></p>
+<ul style="font-size:10.5px;">
+<li>Wazuh agent deployed on all Hetzner servers (monitor yourself)</li>
+<li>Fail2ban on all public-facing SSH</li>
+<li>Cloudflare Zero Trust for admin panel access</li>
+<li>Weekly automated vulnerability scan of own infra</li>
+<li>Annual external pentest of own infrastructure (mandatory)</li>
+</ul>
+</div>
+<div>
+<p style="font-size:11px;"><strong>Incident Response for Own Infra:</strong></p>
+<ul style="font-size:10.5px;">
+<li>Dedicated runbook for "MSSP own infra breach" scenario</li>
+<li>Client notification procedure: 4h SLA for breach disclosure</li>
+<li>Cyber liability insurance: JOD 600–1,000/year (mandatory Day 1)</li>
+<li>Backups tested monthly — restore drill quarterly</li>
+<li>SOC 2 Type II target for Year 3 (builds enterprise trust)</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="card mt-20">
+<h3>Business effect</h3>
+<ul>
+<li><strong>Cost impact:</strong> Isolation-by-design reduces breach blast radius and lowers potential legal/remediation costs.</li>
+<li><strong>Analyst time impact:</strong> Tenant-scoped roles and workspaces cut investigation friction and reduce context-switching.</li>
+<li><strong>Margin impact:</strong> Strong tenant isolation increases contract trust and compliance confidence, improving retention and enterprise win rates.</li>
+</ul>
+</div>
+</section>
+
+<section class="section" id="automation">
+<div class="section-header"><span class="section-num">05.4</span><h1 class="section-title">Automation Engine — Playbook Library</h1></div>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>Playbook Name</th><th>Trigger</th><th>Automated Actions</th><th>Human Escalation Condition</th><th>Auto-Close?</th></tr></thead>
+<tbody>
+<tr><td class="bold">PB-001: Phishing Email Triage</td><td>Inbound suspicious email (header analysis)</td><td>URL extraction → VirusTotal/OTX check → block domain if malicious → notify user → log in TheHive</td><td>If user reports clicking link or attachment</td><td class="gr">Yes (if clean)</td></tr>
+<tr><td class="bold">PB-002: Brute Force Detection</td><td>5+ failed logins in 5 min (same source)</td><td>GeoIP check → if foreign IP → auto-block via firewall API → alert analyst dashboard</td><td>If source IP is internal subnet</td><td class="gr">Yes (if blocked)</td></tr>
+<tr><td class="bold">PB-003: Malware/AV Alert</td><td>Wazuh AV/ClamAV detection rule triggered</td><td>Process name lookup → hash check (VirusTotal) → isolate flag set → MITRE ATT&CK enrichment → severity scoring</td><td>Always escalate if hash confirmed malicious</td><td class="re">Never</td></tr>
+<tr><td class="bold">PB-004: Privilege Escalation</td><td>sudo/admin command on non-admin account</td><td>User activity baseline check → if anomalous time/command → alert → check for lateral movement indicators</td><td>If new admin account created outside change window</td><td class="re">Never</td></tr>
+<tr><td class="bold">PB-005: Vulnerability Found</td><td>OpenVAS scan result ingested</td><td>CVSS score → if Critical/High → create TheHive task → notify client IT lead via email → set patch deadline</td><td>If CVSS ≥ 9.0 (Critical)</td><td class="gr">Yes (if Medium/Low)</td></tr>
+<tr><td class="bold">PB-006: After-Hours Alert Routing</td><td>Any alert Severity ≥ 7 outside business hours</td><td>Check client SLA tier → SOC Pro/Hybrid: PagerDuty → analyst phone. SOC Lite/Standard: queue for morning with timestamp log</td><td>Always for Severity ≥ 8</td><td class="re">No</td></tr>
+<tr><td class="bold">PB-007: Data Exfiltration Indicator</td><td>Outbound transfer >500MB to unknown IP</td><td>GeoIP lookup → IP reputation check → if suspicious → block egress → alert immediately → open P1 case</td><td>Always — P1 immediate</td><td class="re">Never</td></tr>
+<tr><td class="bold">PB-008: Ransomware Pre-Cursor</td><td>Shadow copy deletion OR mass encryption pattern</td><td>Immediate isolation flag → P0 case opened → analyst phone alert → client emergency contact notified</td><td>Always — P0 emergency</td><td class="re">Never</td></tr>
+<tr><td class="bold">PB-009: Failed VPN Login</td><td>5+ failed VPN auth attempts</td><td>User identity lookup → if valid user → notify user of attempt → if unknown user → block + alert</td><td>If valid user denies attempt (credential compromise)</td><td class="gr">Yes (unknown user)</td></tr>
+<tr><td class="bold">PB-010: Compliance Report Generation</td><td>Scheduled (monthly, 1st of month)</td><td>Pull 30-day alert stats → generate summary (events handled, incidents, MTTR) → render PDF → email to client</td><td>If error in report generation</td><td class="gr">Yes (automated)</td></tr>
+<tr><td class="bold">PB-011: New Asset Detected</td><td>Rogue asset (new IP on client subnet not in inventory)</td><td>MAC lookup → OS fingerprint → if unknown device → alert client IT admin → add to pending inventory review</td><td>If device shows active service ports (potential threat)</td><td class="gr">Yes (after 24h if confirmed)</td></tr>
+<tr><td class="bold">PB-012: DMARC Failure Alert</td><td>DMARC fail report received for client domain</td><td>Parse DMARC XML report → identify spoofing source IP → check IP reputation → notify client → recommend DMARC policy change if pattern repeats</td><td>If internal IP listed in DMARC fail (misconfiguration)</td><td class="gr">Yes (external spoofing)</td></tr>
+</tbody></table>
+</div>
+<div class="callout success mt-20">
+<div class="callout-title">Automation Rate Achievement: How to Reach 85%</div>
+<p>In a typical 100-alert week: ~50 auth-noise alerts map to PB-002/PB-009, ~20 phishing alerts map to PB-001, ~10 vuln alerts map to PB-005, and ~5 asset alerts map to PB-011. <strong>Result: 85 alerts auto-resolved, 15 escalated.</strong> As tuning improves in months 1–3, false positives drop and automation stays stable.</p>
+</div>
+<div class="card mt-20">
+<h3>Business effect</h3>
+<ul>
+<li><strong>Cost impact:</strong> Higher automation lowers cost per alert handled and limits headcount growth.</li>
+<li><strong>Analyst time impact:</strong> Higher automation rate directly increases analyst capacity (target 30–35 clients per analyst).</li>
+<li><strong>Margin impact:</strong> Stable auto-resolution rates preserve service quality while expanding gross margin at scale.</li>
+</ul>
+</div>
+</section>
+
+<section class="section" id="log-economics">
+<div class="section-header"><span class="section-num">05.5</span><h1 class="section-title">Log Economics — The Critical MSSP Margin Driver</h1></div>
+<div class="callout danger">
+<div class="callout-title">Why Unlimited Logging Will Destroy Your Margins</div>
+<p>A verbose IIS/Apache server can generate 50–200 GB/day. At Sentinel pricing ($2.46/GB), that is $3,700–$14,760/month for one client. Even on Hetzner, uncontrolled logs make compute and storage costs volatile. <strong>Contract log caps are mandatory from Day 1.</strong></p>
+</div>
+
+<div class="table-wrap mt-20">
+<table>
+<thead><tr><th>Log Source Type</th><th class="num">Typical Volume</th><th>Action</th><th class="num">Sampling Rate</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td class="bold">Windows Event Logs (Auth, Process)</td><td class="num">50–200 MB/day</td><td class="gr">Full ingestion</td><td class="num">100%</td><td>Critical security events. Always ingest.</td></tr>
+<tr><td class="bold">Windows Event Logs (System, App noise)</td><td>500MB–2GB/day</td><td class="or">Filter before ingest</td><td class="num">10–20%</td><td>Pre-filter: only Error/Critical levels. Drop Informational.</td></tr>
+<tr><td class="bold">Linux syslog / auth.log</td><td class="num">10–100 MB/day</td><td class="gr">Full ingestion</td><td class="num">100%</td><td>Compact. Always ingest. High signal-to-noise.</td></tr>
+<tr><td class="bold">Web server access logs (IIS/Apache/Nginx)</td><td class="num">1–50 GB/day</td><td class="re">Sample / cap</td><td class="num">5–10%</td><td>Full logs to cold archive. Only anomalous entries (4xx, 5xx bursts) to hot SIEM.</td></tr>
+<tr><td class="bold">Firewall / Network logs</td><td>200MB–5GB/day</td><td class="or">Filter + sample</td><td class="num">20–30%</td><td>Block events: full ingest. Allow events: 5% sample. VPN auth: full.</td></tr>
+<tr><td class="bold">DNS query logs</td><td>100MB–2GB/day</td><td class="or">Filter</td><td class="num">~5%</td><td>High noise. Only suspicious domains (DGA detection, C2 patterns) forwarded.</td></tr>
+<tr><td class="bold">Email server logs (Exchange/M365)</td><td class="num">50–500 MB/day</td><td class="gr">Full ingestion</td><td class="num">100%</td><td>Phishing detection. Low volume, high value.</td></tr>
+<tr><td class="bold">Cloud audit logs (AWS CloudTrail, Azure Monitor)</td><td>100MB–1GB/day</td><td class="or">Filter by severity</td><td class="num">50%</td><td>IAM changes, API calls: full. Data access: sample.</td></tr>
+</tbody></table>
+</div>
+
+<h2 class="mt-30">Pre-Filtering Pipeline (Reduces Effective Volume by 40–60%)</h2>
+<div class="card-grid cols-3 mt-20">
+<div class="card">
+<h3>Stage 1: Filebeat Pre-Filter</h3>
+<p>At the client endpoint/server, Filebeat uses <code>drop_fields</code> and <code>drop_event</code>. Forward only security-relevant events to SIEM. Keep raw logs on-client per contract retention. Typical result: 50–70% less transfer and SIEM storage.</p>
+</div>
+<div class="card">
+<h3>Stage 2: Wazuh Decoder + Rule Filter</h3>
+<p>Wazuh applies decoders and rules before alert generation. Only events with severity ≥ 3 create alerts. Deduplication counts identical events once per 60 seconds. This removes repetitive noise before storage.</p>
+</div>
+<div class="card">
+<h3>Stage 3: Elasticsearch ILM</h3>
+<p>Elasticsearch ILM enforces tiered retention: Hot 30–90 days, Warm 90–180 days, Cold 180–365 days, then Delete by SLA. This keeps active compute low and maintains compliance retention.</p>
+</div>
+</div>
+
+<h2 class="mt-30">Overage Billing Model</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Contract Tier</th><th class="num">Included GB/day (hot)</th><th class="num">Overage Rate</th><th>Alert Mechanism</th><th>Client MSA Clause</th></tr></thead>
+<tbody>
+<tr><td class="bold">SOC Lite</td><td class="num">2 GB/day</td><td class="num or">JOD 0.50/GB/day over cap</td><td>Alert at 80% utilization weekly</td><td>"Client responsible for log source configuration. Overage billed monthly."</td></tr>
+<tr><td class="bold">SOC Standard</td><td class="num">10 GB/day</td><td class="num or">JOD 0.35/GB/day over cap</td><td>Alert at 80% utilization weekly</td><td>Same clause + volume review at renewal</td></tr>
+<tr><td class="bold">SOC Pro</td><td class="num">20 GB/day</td><td class="num or">JOD 0.25/GB/day over cap</td><td>Alert at 75% utilization</td><td>Quarterly volume review included in Pro tier</td></tr>
+<tr><td class="bold">SOC + GRC Hybrid</td><td class="num">30 GB/day</td><td class="num or">JOD 0.20/GB/day over cap</td><td>Monthly volume report</td><td>Annual review with capacity planning recommendation</td></tr>
+</tbody></table>
+</div>
+<div class="card mt-20">
+<h3>Business effect</h3>
+<ul>
+<li><strong>Cost impact:</strong> Log controls and overage clauses convert variable ingestion spikes into predictable COGS.</li>
+<li><strong>Analyst time impact:</strong> Pre-filtering removes low-signal noise, so analysts spend more time on actionable alerts.</li>
+<li><strong>Margin impact:</strong> Predictable log economics prevent unexpected storage/compute overruns that erode gross margin.</li>
+</ul>
+</div>
+</section>
+
+<section class="section" id="scaling">
+<div class="section-header"><span class="section-num">05.6</span><h1 class="section-title">Infrastructure Scaling Path</h1></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Phase</th><th>Client Count</th><th>Server Configuration</th><th class="num">Monthly Infra (JOD)</th><th class="num">Analyst Headcount</th><th>Key Action</th></tr></thead>
+<tbody>
+<tr><td class="bold ac">Phase 0 (Validation)</td><td class="num">0–3 (pilot)</td><td>1x Hetzner CX21 (2vCPU/4GB) — minimal</td><td class="num go">25</td><td>Founder only</td><td>Validate playbooks, measure alert volume, tune rules</td></tr>
+<tr><td class="bold ac">Phase 1</td><td class="num">1–15</td><td>2x CX31 (4vCPU/8GB) + 200GB block storage each</td><td class="num go">75</td><td>Founder only</td><td>Separate SIEM node from SOAR node</td></tr>
+<tr><td class="bold ac">Phase 2</td><td class="num">16–30</td><td>3x CX41 (16vCPU/32GB) + expanded storage</td><td class="num go">140</td><td>Founder only</td><td>Add dedicated TheHive + OpenCTI node</td></tr>
+<tr><td class="bold go">Phase 3</td><td class="num">31–50</td><td>4x CX41 + dedicated 3-node Elastic cluster</td><td class="num go">240</td><td>Founder + 1 analyst</td><td>Separate hot/warm tiers in Elasticsearch</td></tr>
+<tr><td class="bold go">Phase 4</td><td class="num">51–75</td><td>6x CX51 (32vCPU/64GB) + Elastic + separate SOAR cluster</td><td class="num go">380</td><td>Founder + 2 analysts</td><td>Load balancer for SIEM ingestion</td></tr>
+<tr><td class="bold or">Phase 5</td><td class="num">76–100</td><td>8x CX51 + dedicated threat intel node + backup cluster</td><td class="num go">520</td><td>Founder + 3–4 analysts</td><td>HA setup for core SIEM components</td></tr>
+<tr class="total"><td colspan="2" class="bold">Cost per client (infra only)</td><td colspan="2">JOD 5–7/client/month at scale</td><td colspan="2">Sub-linear: 100 clients at same infra cost as 50 clients (storage aside)</td></tr>
+</tbody></table>
+</div>
+<div class="card mt-20">
+<h3>Business effect</h3>
+<ul>
+<li><strong>Cost impact:</strong> Phased Hetzner scaling keeps infrastructure spend sub-linear as the client base grows.</li>
+<li><strong>Analyst time impact:</strong> Capacity planning aligns automation and headcount, avoiding analyst overload during growth phases.</li>
+<li><strong>Margin impact:</strong> Controlled infra and staffing expansion protects per-client margin through 100-client scale.</li>
+</ul>
+</div>
+</section>
+
+</div>
+<script src="nav.js"></script>
+<script>buildSidebar('tech.html');</script>
+</body></html>
